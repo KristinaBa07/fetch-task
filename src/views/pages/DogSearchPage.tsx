@@ -8,6 +8,7 @@ import { Dog } from "../../models/dogModel";
 import FilterBar from "../components/FilterBar";
 import DogGrid from "../components/DogGrid";
 import FavoritesSection from "../components/FavoritesSection";
+import MatchedDogDisplay from "../components/MatchedDogDisplay";
 
 
 function DogSearchPage() {
@@ -126,6 +127,13 @@ function DogSearchPage() {
                 handleGenerateMatch={handleGenerateMatch}
             />
 
+            {/* Matched Dog Display */}
+            {matchedDog && (
+                <MatchedDogDisplay
+                    matchedDog={matchedDog}
+                />
+            )}
+
         </Box>
     );
 }
@@ -135,7 +143,6 @@ const styles = {
     filterBox:{ display: "flex", gap: 2, mb: 2 },
     paginationBox:{ mb: 2 },
     dogCard:{ height: "100%", display: "flex", flexDirection: "column" },
-    matchDisplayBox: { mt: 2, p: 2, border: "1px solid #ccc", display: "inline-block" }
 }
 
 export default DogSearchPage;
