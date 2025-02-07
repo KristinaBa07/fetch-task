@@ -3,10 +3,11 @@ import {
     Box,
     Typography,
 } from "@mui/material";
-import { fetchAllBreeds, searchDogIds, fetchDogsByIds } from "../../controllers/dogController";
+import { fetchAllBreeds, searchDogIds, fetchDogsByIds, generateMatch } from "../../controllers/dogController";
 import { Dog } from "../../models/dogModel";
 import FilterBar from "../components/FilterBar";
 import DogGrid from "../components/DogGrid";
+import FavoritesSection from "../components/FavoritesSection";
 
 
 function DogSearchPage() {
@@ -22,6 +23,7 @@ function DogSearchPage() {
     const [prevQuery, setPrevQuery] = useState<string | null>(null);
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [favorites, setFavorites] = useState<Dog[]>([]);
+    const [matchedDog, setMatchedDog] = useState<Dog | null>(null);
 
 
 
@@ -78,6 +80,21 @@ function DogSearchPage() {
         }
     }
 
+    async function handleGenerateMatch() {
+        if (favorites.length === 0) return;
+        try {
+            const dogIds = favorites.map((favorite: Dog) => favorite.id);
+            const matchedId = await generateMatch(dogIds);
+
+            const [dog] = await fetchDogsByIds([matchedId]);
+            setMatchedDog(dog);
+        } catch (err) {
+            console.error("Match Error:", err);
+            alert("Error generating match");
+        }
+    }
+
+
 
 
     return (
@@ -102,6 +119,13 @@ function DogSearchPage() {
                 favorites={favorites}
                 toggleFavorite={toggleFavorite}
             />
+
+            {/* Favorites & Match */}
+            <FavoritesSection
+                favorites={favorites}
+                handleGenerateMatch={handleGenerateMatch}
+            />
+
         </Box>
     );
 }
