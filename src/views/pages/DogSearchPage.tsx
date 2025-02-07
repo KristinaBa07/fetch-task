@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Typography,
-    Pagination, Fade, Modal
+    Pagination, Modal, Button
 } from "@mui/material";
 import { fetchAllBreeds, searchDogIds, fetchDogsByIds, generateMatch } from "../../controllers/dogController";
 import { Dog } from "../../models/dogModel";
@@ -11,9 +11,12 @@ import DogGrid from "../components/DogGrid";
 import FavoritesSection from "../components/FavoritesSection";
 import MatchedDogDisplay from "../components/MatchedDogDisplay";
 import SearchIcon from "@mui/icons-material/Search";
+import {logoutUser} from "../../controllers/authController";
+import {useNavigate} from "react-router-dom";
 
 
 function DogSearchPage() {
+    const navigate = useNavigate();
     const [breedOptions, setBreedOptions] = useState<string[]>([]);
     const [selectedBreed, setSelectedBreed] = useState<string>("");
     const [sortField, setSortField] = useState<"breed" | "name" | "age">("breed");
@@ -98,9 +101,16 @@ function DogSearchPage() {
         }
     }
 
+    async function logoutHandler (){
+        await logoutUser();
+        localStorage.removeItem("authorized");
+        navigate("/login");
+    }
+
 
     return (
         <Box sx={styles.dogSearchPageBox}>
+            <Button sx={{position:'absolute', top:'20px', right:'20px'}} onClick={logoutHandler}>Log Out</Button>
 
             <Typography variant="h2" gutterBottom sx={styles.title}>
                 <SearchIcon fontSize="large" />

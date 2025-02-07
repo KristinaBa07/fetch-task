@@ -34,7 +34,7 @@ export function setupAxiosInterceptors() {
       switch (status) {
         case 401:
           alert(MSG_401);
-          localStorage.removeItem("token");
+          localStorage.removeItem("authorized");
           window.location.href = "/login";
           break;
 

@@ -4,7 +4,7 @@ import LoginPage from "./views/pages/LoginPage";
 import DogSearchPage from "./views/pages/DogSearchPage";
 
 const isAuthenticated = () => {
-    return localStorage.getItem("token")  // Replace with your actual auth logic
+    return localStorage.getItem("authorized") === "true"
 };
 
 function App() {

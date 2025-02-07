@@ -9,9 +9,8 @@ function LoginPage() {
 
     async function handleLogin(name: string, email: string) {
         try {
-            const res = await loginUser({ name, email });
-
-            localStorage.setItem('token', res.token)
+            await loginUser({ name, email });
+            await localStorage.setItem('authorized', 'true');
             navigate("/");
         } catch (error) {
             console.error("Login failed:", error);

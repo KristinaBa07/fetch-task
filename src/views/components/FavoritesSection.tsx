@@ -14,7 +14,7 @@ function FavoritesSection({favorites, handleGenerateMatch, toggleFavorite}: Favo
             <Typography variant="h6">Favorites ({favorites.length})</Typography>
             <Box sx={styles.favoritesWrap}>
                 {favorites.map((dog) => (
-                    <Chip sx={styles.favoriteItem} label={`${dog.name } ${dog.breed}`} variant="outlined" onDelete={() => toggleFavorite(dog)} />
+                    <Chip key={Math.random()} sx={styles.favoriteItem} label={`${dog.name } ${dog.breed}`} variant="outlined" onDelete={() => toggleFavorite(dog)} />
                 ))}
             </Box>
             <Button
