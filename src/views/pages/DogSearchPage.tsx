@@ -103,7 +103,6 @@ function DogSearchPage() {
 
     async function logoutHandler (){
         await logoutUser();
-        localStorage.removeItem("authorized");
         navigate("/login");
     }
 

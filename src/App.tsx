@@ -3,9 +3,6 @@ import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import LoginPage from "./views/pages/LoginPage";
 import DogSearchPage from "./views/pages/DogSearchPage";
 
-const isAuthenticated = () => {
-    return localStorage.getItem("authorized") === "true"
-};
 
 function App() {
 
@@ -15,7 +12,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
           <Route
               path="/"
-              element={isAuthenticated() ? <DogSearchPage /> :  <Navigate to="/login" />}
+              element={ <DogSearchPage /> }
           />
       </Routes>
     </BrowserRouter>
