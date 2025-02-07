@@ -1,0 +1,97 @@
+import React, { useEffect, useState } from "react";
+import {
+    Box,
+    Typography,
+} from "@mui/material";
+import { fetchAllBreeds, searchDogIds, fetchDogsByIds } from "../../controllers/dogController";
+import { Dog } from "../../models/dogModel";
+import FilterBar from "../components/FilterBar";
+
+
+function DogSearchPage() {
+    const [breedOptions, setBreedOptions] = useState<string[]>([]);
+    const [selectedBreed, setSelectedBreed] = useState<string>("");
+    const [sortField, setSortField] = useState<"breed" | "name" | "age">("breed");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const pageSize = 6;
+    const [totalResults, setTotalResults] = useState(0);
+    const [page, setPage] = useState(1);
+    const from = (page - 1) * pageSize;
+    const [nextQuery, setNextQuery] = useState<string | null>(null);
+    const [prevQuery, setPrevQuery] = useState<string | null>(null);
+    const [dogs, setDogs] = useState<Dog[]>([]);
+
+
+
+    // 1) Fetch all breed names on mount
+    useEffect(() => {
+        fetchAllBreeds()
+            .then(setBreedOptions)
+            .catch(err => console.error("Failed to get breed list:", err));
+    }, []);
+
+    // 2) Rerun search on changes to breed, sort, or page
+    useEffect(() => {
+        doSearch();
+    }, [selectedBreed, sortField, sortDirection, page]);
+
+
+    async function doSearch() {
+        try {
+            // Step A: Get dog IDs from /dogs/search
+            const queryParams: Record<string, any> = {
+                size: pageSize,
+                from: from,
+                sort: `${sortField}:${sortDirection}`
+            };
+            if (selectedBreed) {
+                queryParams.breeds = [selectedBreed];
+            }
+
+            const searchRes = await searchDogIds(queryParams);
+            setTotalResults(searchRes.total);
+            setNextQuery(searchRes.next || null);
+            setPrevQuery(searchRes.prev || null);
+
+            // Step B: fetch the actual Dog objects
+            if (searchRes.resultIds.length > 0) {
+                const dogObjects = await fetchDogsByIds(searchRes.resultIds);
+                setDogs(dogObjects);
+            } else {
+                setDogs([]);
+            }
+        } catch (err) {
+            console.error("Search Error:", err);
+        }
+    }
+
+
+
+    return (
+        <Box sx={styles.dogSearchPageBox}>
+            <Typography variant="h4" gutterBottom>Dog Search</Typography>
+
+            {/* Filter / Sort UI */}
+            <FilterBar
+                selectedBreed={selectedBreed}
+                setSelectedBreed={setSelectedBreed}
+                breedOptions={breedOptions}
+                sortField={sortField}
+                setSortField={setSortField}
+                sortDirection={sortDirection}
+                setSortDirection={setSortDirection}
+                setPage={setPage}
+            />
+        </Box>
+    );
+}
+
+const styles = {
+    dogSearchPageBox: { p: 2 },
+    filterBox:{ display: "flex", gap: 2, mb: 2 },
+    paginationBox:{ mb: 2 },
+    dogCard:{ height: "100%", display: "flex", flexDirection: "column" },
+    matchDisplayBox: { mt: 2, p: 2, border: "1px solid #ccc", display: "inline-block" }
+}
+
+export default DogSearchPage;
