@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Typography,
+    Pagination
 } from "@mui/material";
 import { fetchAllBreeds, searchDogIds, fetchDogsByIds, generateMatch } from "../../controllers/dogController";
 import { Dog } from "../../models/dogModel";
@@ -20,6 +21,7 @@ function DogSearchPage() {
     const [totalResults, setTotalResults] = useState(0);
     const [page, setPage] = useState(1);
     const from = (page - 1) * pageSize;
+    const totalPages = Math.ceil(totalResults / pageSize);
     const [nextQuery, setNextQuery] = useState<string | null>(null);
     const [prevQuery, setPrevQuery] = useState<string | null>(null);
     const [dogs, setDogs] = useState<Dog[]>([]);
@@ -96,8 +98,6 @@ function DogSearchPage() {
     }
 
 
-
-
     return (
         <Box sx={styles.dogSearchPageBox}>
             <Typography variant="h4" gutterBottom>Dog Search</Typography>
@@ -120,6 +120,22 @@ function DogSearchPage() {
                 favorites={favorites}
                 toggleFavorite={toggleFavorite}
             />
+
+            {/* Pagination */}
+            <Box sx={styles.paginationBox}>
+                <Typography>
+                    Showing {dogs.length} of {totalResults} results
+                </Typography>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={(event, newPage) => setPage(newPage)}
+                    color="primary"
+                    shape="rounded"
+                    sx={{ mt: 1 }}
+                />
+            </Box>
+
 
             {/* Favorites & Match */}
             <FavoritesSection
