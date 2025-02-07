@@ -10,7 +10,7 @@ function LoginPage() {
     async function handleLogin(name: string, email: string) {
         try {
             await loginUser({ name, email });
-            navigate("/");
+            navigate("/dogs");
         } catch (error) {
             console.error("Login failed:", error);
             alert("Login failed. Please check console for details.");

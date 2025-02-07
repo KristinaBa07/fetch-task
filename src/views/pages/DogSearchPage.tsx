@@ -103,7 +103,7 @@ function DogSearchPage() {
 
     async function logoutHandler (){
         await logoutUser();
-        navigate("/login");
+        navigate("/");
     }
 
 

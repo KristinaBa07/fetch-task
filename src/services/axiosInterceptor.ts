@@ -34,7 +34,7 @@ export function setupAxiosInterceptors() {
       switch (status) {
         case 401:
           alert(MSG_401);
-          window.location.href = "/login";
+          window.location.href = "/";
           break;
 
         case 403:
