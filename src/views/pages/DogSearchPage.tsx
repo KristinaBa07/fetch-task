@@ -6,6 +6,7 @@ import {
 import { fetchAllBreeds, searchDogIds, fetchDogsByIds } from "../../controllers/dogController";
 import { Dog } from "../../models/dogModel";
 import FilterBar from "../components/FilterBar";
+import DogGrid from "../components/DogGrid";
 
 
 function DogSearchPage() {
@@ -20,6 +21,8 @@ function DogSearchPage() {
     const [nextQuery, setNextQuery] = useState<string | null>(null);
     const [prevQuery, setPrevQuery] = useState<string | null>(null);
     const [dogs, setDogs] = useState<Dog[]>([]);
+    const [favorites, setFavorites] = useState<Dog[]>([]);
+
 
 
 
@@ -66,6 +69,16 @@ function DogSearchPage() {
     }
 
 
+    function toggleFavorite(dog: Dog) {
+        const isFav = favorites.some((favorite: Dog) => favorite.id === dog.id);
+        if (isFav) {
+            setFavorites(favorites.filter((favorite: Dog) => favorite.id !== dog.id));
+        } else {
+            setFavorites([...favorites, dog]);
+        }
+    }
+
+
 
     return (
         <Box sx={styles.dogSearchPageBox}>
@@ -81,6 +94,13 @@ function DogSearchPage() {
                 sortDirection={sortDirection}
                 setSortDirection={setSortDirection}
                 setPage={setPage}
+            />
+
+            {/* Dog Grid */}
+            <DogGrid
+                dogs={dogs}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
             />
         </Box>
     );
