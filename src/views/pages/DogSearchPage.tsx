@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     Box,
     Typography,
-    Pagination
+    Pagination, Fade, Modal
 } from "@mui/material";
 import { fetchAllBreeds, searchDogIds, fetchDogsByIds, generateMatch } from "../../controllers/dogController";
 import { Dog } from "../../models/dogModel";
@@ -10,6 +10,7 @@ import FilterBar from "../components/FilterBar";
 import DogGrid from "../components/DogGrid";
 import FavoritesSection from "../components/FavoritesSection";
 import MatchedDogDisplay from "../components/MatchedDogDisplay";
+import SearchIcon from "@mui/icons-material/Search";
 
 
 function DogSearchPage() {
@@ -17,7 +18,7 @@ function DogSearchPage() {
     const [selectedBreed, setSelectedBreed] = useState<string>("");
     const [sortField, setSortField] = useState<"breed" | "name" | "age">("breed");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-    const pageSize = 6;
+    const pageSize = 8;
     const [totalResults, setTotalResults] = useState(0);
     const [page, setPage] = useState(1);
     const from = (page - 1) * pageSize;
@@ -27,7 +28,7 @@ function DogSearchPage() {
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [favorites, setFavorites] = useState<Dog[]>([]);
     const [matchedDog, setMatchedDog] = useState<Dog | null>(null);
-
+    const [matchedDogWindowIsOpen, setMatchedDogWindowIsOpen] = useState<boolean>(false)
 
 
 
@@ -73,7 +74,6 @@ function DogSearchPage() {
         }
     }
 
-
     function toggleFavorite(dog: Dog) {
         const isFav = favorites.some((favorite: Dog) => favorite.id === dog.id);
         if (isFav) {
@@ -91,6 +91,7 @@ function DogSearchPage() {
 
             const [dog] = await fetchDogsByIds([matchedId]);
             setMatchedDog(dog);
+            setMatchedDogWindowIsOpen(true)
         } catch (err) {
             console.error("Match Error:", err);
             alert("Error generating match");
@@ -100,65 +101,106 @@ function DogSearchPage() {
 
     return (
         <Box sx={styles.dogSearchPageBox}>
-            <Typography variant="h4" gutterBottom>Dog Search</Typography>
+
+            <Typography variant="h2" gutterBottom sx={styles.title}>
+                <SearchIcon fontSize="large" />
+                Dog Search
+            </Typography>
 
             {/* Filter / Sort UI */}
-            <FilterBar
-                selectedBreed={selectedBreed}
-                setSelectedBreed={setSelectedBreed}
-                breedOptions={breedOptions}
-                sortField={sortField}
-                setSortField={setSortField}
-                sortDirection={sortDirection}
-                setSortDirection={setSortDirection}
-                setPage={setPage}
-            />
+            <Box sx={styles.filterBarWrap}>
+                <FilterBar
+                    selectedBreed={selectedBreed}
+                    setSelectedBreed={setSelectedBreed}
+                    breedOptions={breedOptions}
+                    sortField={sortField}
+                    setSortField={setSortField}
+                    sortDirection={sortDirection}
+                    setSortDirection={setSortDirection}
+                    setPage={setPage}
+                />
+
+            </Box>
 
             {/* Dog Grid */}
-            <DogGrid
-                dogs={dogs}
-                favorites={favorites}
-                toggleFavorite={toggleFavorite}
-            />
-
-            {/* Pagination */}
-            <Box sx={styles.paginationBox}>
-                <Typography>
-                    Showing {dogs.length} of {totalResults} results
-                </Typography>
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(event, newPage) => setPage(newPage)}
-                    color="primary"
-                    shape="rounded"
-                    sx={{ mt: 1 }}
+            <Box sx={styles.dogGridBox}>
+                <DogGrid
+                    dogs={dogs}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
                 />
             </Box>
 
+            {/* Pagination */}
+            <Box sx={styles.paginationWrapper}>
+                <Box sx={styles.paginationBox}>
+                    <Typography>
+                        Found {totalResults} dogs
+                    </Typography>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(event, newPage) => setPage(newPage)}
+                        color="primary"
+                        shape="rounded"
+                        sx={{ mt: 1 }}
+                    />
+                </Box>
+            </Box>
+
+
 
             {/* Favorites & Match */}
-            <FavoritesSection
-                favorites={favorites}
-                handleGenerateMatch={handleGenerateMatch}
-            />
+            <Box sx={styles.favoritesBox}>
+                <FavoritesSection
+                    favorites={favorites}
+                    handleGenerateMatch={handleGenerateMatch}
+                    toggleFavorite={toggleFavorite}
+                />
+            </Box>
 
             {/* Matched Dog Display */}
-            {matchedDog && (
-                <MatchedDogDisplay
-                    matchedDog={matchedDog}
-                />
-            )}
-
+            <Modal
+                open={matchedDogWindowIsOpen}
+                onClose={() => setMatchedDogWindowIsOpen(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                sx={styles.matchedWrap}
+            >
+                <Box sx={styles.matchedBox}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        The best match for you
+                    </Typography>
+                    {matchedDog && <MatchedDogDisplay
+                        matchedDog={matchedDog}
+                    />}
+                </Box>
+            </Modal>
         </Box>
     );
 }
 
 const styles = {
-    dogSearchPageBox: { p: 2 },
-    filterBox:{ display: "flex", gap: 2, mb: 2 },
-    paginationBox:{ mb: 2 },
-    dogCard:{ height: "100%", display: "flex", flexDirection: "column" },
-}
+    title: { display: "flex", alignItems: "center", gap: "8px", mb: 7 },
+    dogSearchPageBox: { display: "flex", flexDirection: "column", alignItems: "center", p: 2 },
+    filterBox: { display: "flex", gap: 2, mb: 2 },
+    filterBarWrap: { mb: 7 },
+    paginationBox: { mb: 2, display: "flex", alignItems: "flex-end", justifyContent: "space-between" },
+    dogCard: { height: "100%", display: "flex", flexDirection: "column" },
+    dogGridBox: {},
+    paginationWrapper: { display: "flex", justifyContent: "flex-end" },
+    favoritesBox: { width: "100%", maxWidth: "100%", display: "flex", justifyContent: "flex-start" },
+    matchedWrap: { display: "flex", justifyContent: "center", alignItems: "center" },
+    matchedBox: {
+        width: "500px",
+        backgroundColor: "white",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        borderRadius: "5px"
+    }
+};
+
 
 export default DogSearchPage;

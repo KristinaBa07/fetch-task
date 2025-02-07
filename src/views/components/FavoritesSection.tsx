@@ -1,21 +1,22 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import {Box, Typography, Button, Chip} from "@mui/material";
 import { Dog } from "../../models/dogModel";
 
 interface FavoritesSectionProps {
     favorites: Dog[];
     handleGenerateMatch: () => void;
+    toggleFavorite: (dog: Dog) => void;
 }
 
-function FavoritesSection({favorites, handleGenerateMatch}: FavoritesSectionProps) {
+function FavoritesSection({favorites, handleGenerateMatch, toggleFavorite}: FavoritesSectionProps) {
     return (
         <Box sx={{ mt: 4 }}>
             <Typography variant="h6">Favorites ({favorites.length})</Typography>
-            {favorites.map((d) => (
-                <Typography key={d.id}>
-                    {d.name} ({d.breed})
-                </Typography>
-            ))}
+            <Box sx={styles.favoritesWrap}>
+                {favorites.map((dog) => (
+                    <Chip sx={styles.favoriteItem} label={`${dog.name } ${dog.breed}`} variant="outlined" onDelete={() => toggleFavorite(dog)} />
+                ))}
+            </Box>
             <Button
                 variant="contained"
                 sx={{ mt: 2 }}
@@ -26,6 +27,11 @@ function FavoritesSection({favorites, handleGenerateMatch}: FavoritesSectionProp
             </Button>
         </Box>
     );
+}
+
+const styles = {
+    favoritesWrap: {display: 'flex', flexWrap:'wrap'},
+    favoriteItem:{m:1}
 }
 
 export default FavoritesSection;

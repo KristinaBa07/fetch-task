@@ -24,7 +24,7 @@ function MatchedDogDisplay({ matchedDog }: MatchedDogDisplayProps) {
 }
 
 const styles = {
-    matchDisplayBox: { mt: 2, p: 2, border: "1px solid #ccc", display: "inline-block" }
+    matchDisplayBox: { mt: 2, p: 2, display: "inline-block", backgroundColor:"white" }
 }
 
 export default MatchedDogDisplay;
